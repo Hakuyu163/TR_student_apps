@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>サンプラー風 MIDI＆波形選択サンプル【最終統合版】</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    #waveCanvas {
+      border: 1px solid #666;
+      display: block;
+      margin-top: 10px;
+      cursor: crosshair;
+    }
+    #controls {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 常時表示：ファイル選択ボタン -->
+  <input type="file" id="fileInput" accept="audio/*">
+  
+  <!-- Transpose スライダー -->
+  <div id="controls">
+    <label for="transposeInput">Transpose (-12～+12 半音): </label>
+    <input type="range" id="transposeInput" min="-12" max="12" value="0">
+    <span id="transposeValue">0</span>
+  </div>
+  
+  <!-- 波形表示用の Canvas -->
+  <canvas id="waveCanvas" width="800" height="200"></canvas>
+  
+  <script>
+    /*******************
+     * 基本の初期設定 *
+     *******************/
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const fileInput = document.getElementById('fileInput');
+    const canvas = document.getElementById('waveCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Transpose スライダー
+    const transposeInput = document.getElementById('transposeInput');
+    const transposeValueDisplay = document.getElementById('transposeValue');
+    let transpose = parseInt(transposeInput.value);
+    transposeInput.addEventListener('input', (e) => {
+      transpose = parseInt(e.target.value);
+      transposeValueDisplay.textContent = transpose;
+      console.log("Transpose set to:", transpose);
+    });
+    
+    // グローバル変数：デコード済み音声データ
+    let audioBuffer = null;
+    // 再生領域（秒単位）
+    let selectionStart = 0;
+    let selectionEnd = 0;
+    let isSelecting = false;
+    let selectStartX = 0;
+    // MIDIノート管理
+    let activeNotes = {};
+    
+    /******************************************
+     * ファイル選択・波形表示・領域選択処理 *
+     ******************************************/
+    fileInput.addEventListener('change', async (event) => {
+      const files = event.target.files;
+      if (!files || files.length === 0) {
+        alert("ファイルが選択されていません");
+        return;
+      }
+      const file = files[0];
+      console.log("選択されたファイル:", file.name);
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const arrayBuffer = e.target.result;
+          audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+          console.log("AudioBufferが生成されました");
+          drawWaveform();
+          // 初期再生領域はファイル全体
+          selectionStart = 0;
+          selectionEnd = audioBuffer.duration;
+          initMIDI();
+        } catch (err) {
+          console.error("デコードエラー:", err);
+          alert("音声ファイルのデコードに失敗しました");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    });
+    
+    /*********************
+     * 波形描画と領域選択 *
+     *********************/
+    function drawWaveform() {
+      if (!audioBuffer) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const channelData = audioBuffer.getChannelData(0);
+      const step = Math.ceil(channelData.length / canvas.width);
+      const amp = canvas.height / 2;
+      ctx.beginPath();
+      for (let i = 0; i < canvas.width; i++) {
+        let min = 1.0, max = -1.0;
+        for (let j = 0; j < step; j++) {
+          const datum = channelData[(i * step) + j];
+          if (datum < min) min = datum;
+          if (datum > max) max = datum;
+        }
+        const y1 = amp + min * amp;
+        const y2 = amp + max * amp;
+        ctx.moveTo(i, y1);
+        ctx.lineTo(i, y2);
+      }
+      ctx.strokeStyle = "#0077CC";
+      ctx.stroke();
+    }
+    
+    canvas.addEventListener('mousedown', (e) => {
+      if (!audioBuffer) return;
+      isSelecting = true;
+      selectStartX = e.offsetX;
+    });
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isSelecting) return;
+      drawWaveform();
+      const currentX = e.offsetX;
+      ctx.fillStyle = "rgba(0, 0, 255, 0.3)";
+      const x = Math.min(selectStartX, currentX);
+      const width = Math.abs(currentX - selectStartX);
+      ctx.fillRect(x, 0, width, canvas.height);
+    });
+    canvas.addEventListener('mouseup', (e) => {
+      if (!isSelecting) return;
+      isSelecting = false;
+      const selectEndX = e.offsetX;
+      const ratioStart = Math.min(selectStartX, selectEndX) / canvas.width;
+      const ratioEnd = Math.max(selectStartX, selectEndX) / canvas.width;
+      selectionStart = ratioStart * audioBuffer.duration;
+      selectionEnd = ratioEnd * audioBuffer.duration;
+      console.log("選択された再生領域:", selectionStart, "～", selectionEnd);
+    });
+    
+    /*************************************
+     * MIDI初期化とメッセージ処理設定 *
+     *************************************/
+    async function initMIDI() {
+      if (!navigator.requestMIDIAccess) {
+        alert("このブラウザはWeb MIDI APIに対応していません");
+        return;
+      }
+      try {
+        const midiAccess = await navigator.requestMIDIAccess();
+        for (const input of midiAccess.inputs.values()) {
+          input.onmidimessage = onMIDIMessage;
+        }
+        console.log("MIDIアクセス成功");
+      } catch (err) {
+        console.error("MIDIアクセス失敗:", err);
+      }
+    }
+    
+    function onMIDIMessage(e) {
+      const [status, note, velocity] = e.data;
+      const command = status & 0xf0;
+      if (command === 0x90 && velocity > 0) {
+        console.log("Note On:", note);
+        if (!activeNotes[note]) {
+          activeNotes[note] = playNoteWithDSPPitch(note);
+        }
+      } else if (command === 0x80 || (command === 0x90 && velocity === 0)) {
+        console.log("Note Off:", note);
+        if (activeNotes[note]) {
+          activeNotes[note].stop();
+          delete activeNotes[note];
+        }
+      }
+    }
+    
+    /********************************************************************
+     * 演奏モード：MIDI入力による再生（単一の Transpose スライダー適用） *
+     ********************************************************************/
+    function playNoteWithDSPPitch(note) {
+      if (!audioBuffer) {
+        alert("まだ音声ファイルが読み込まれていません");
+        return;
+      }
+      let bufferToPlay = audioBuffer;
+      if (selectionEnd > selectionStart) {
+        bufferToPlay = sliceAudioBuffer(audioBuffer, selectionStart, selectionEnd);
+      }
+      // 単一の Transpose スライダーの値をそのまま適用
+      const effectiveNote = note + transpose;
+      const semitoneDiff = effectiveNote - 60; // baseDefault は 60 (C4)
+      const rate = Math.pow(2, semitoneDiff / 12);
+      const source = audioContext.createBufferSource();
+      source.buffer = bufferToPlay;
+      source.playbackRate.value = rate;
+      source.connect(audioContext.destination);
+      source.start(0);
+      return source;
+    }
+    
+    /**********************************
+     * AudioBufferの一部を切り出す処理 *
+     **********************************/
+    function sliceAudioBuffer(srcBuffer, startSec, endSec) {
+      const sr = srcBuffer.sampleRate;
+      const startSample = Math.floor(startSec * sr);
+      const endSample = Math.floor(endSec * sr);
+      const frameCount = endSample - startSample;
+      const numChannels = srcBuffer.numberOfChannels;
+      const newBuffer = audioContext.createBuffer(numChannels, frameCount, sr);
+      for (let ch = 0; ch < numChannels; ch++) {
+        const channelData = srcBuffer.getChannelData(ch);
+        newBuffer.getChannelData(ch).set(channelData.subarray(startSample, endSample));
+      }
+      return newBuffer;
+    }
+    
+    /******************************************
+     * DSPによるピッチシフト処理（ダミー実装） *
+     ******************************************/
+    function doPitchShift(srcBuffer, pitchFactor) {
+      if (pitchFactor === 1) return srcBuffer;
+      console.warn("DSPピッチシフト処理は未実装です。元のバッファを返します。");
+      return srcBuffer;
+    }
+  </script>
+</body>
+</html>

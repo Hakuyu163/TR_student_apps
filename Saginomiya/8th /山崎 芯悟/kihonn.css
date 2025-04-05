@@ -1,0 +1,21 @@
+body {
+  background-color: lightgoldenrodyellow;
+  color: rgb(153, 125, 55);
+  width: 225px;
+  margin-right: auto;
+  margin-left: auto;
+}
+button {
+  padding: 4px 20px;
+  background-color: burlywood;
+  color: rgb(153, 125, 55);
+  border-style: none;
+  border-radius: 3px;
+}
+
+.face {
+  color: rgb(153, 125, 55);
+}
+.back {
+  color: burlywood;
+}

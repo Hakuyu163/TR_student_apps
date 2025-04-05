@@ -1,0 +1,39 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: hsl(113, 92%, 50%);
+}
+
+img {
+  width: 300px;
+  height: auto;
+  margin: 20px 0;
+  display:block;
+  margin: 0 auto;
+}
+
+input {
+  padding: 10px;
+  font-size: 16px;
+  margin-top:50px;
+}
+
+button {
+  padding: 10px 15px;
+  font-size: 16px;
+  background-color: #370df3;
+  color: rgb(250, 249, 249);
+  border: none;
+  cursor: pointer;
+  margin-top:50px;
+}
+
+button:hover {
+  background-color: #1d0df6;
+}
+
+#result {
+  font-size: 18px;
+    margin-top: 50px;
+
+}

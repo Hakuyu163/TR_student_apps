@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画像クイズ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>この画像は何？</h1>
+    <img id="quiz-image" src=https://www.fuji-net.co.jp/wp/wp-content/uploads/2022/07/thumb-5f56ec5683d05.jpg" alt="クイズ画像">
+    <input type="text" id="answer" placeholder="答えを入力">
+    <button onclick="checkAnswer()">回答する</button>
+    <p id="result"></p>
+    <p>スコア: <span id="score">0</span></p>
+
+    <script src="script.js"></script>
+</body>
+</html>

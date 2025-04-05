@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+        <meta charset="UTF-8">
+        <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                        const menuBtn = document.querySelector('.menu-btn');
+                        const menu = document.querySelector('.menu');
+
+                        menuBtn.addEventListener('click', function() {
+                                menu.classList.toggle('active');
+                        });
+
+                        // Add animation for welcome message
+                        const welcomeMessage = document.createElement('div');
+                        welcomeMessage.textContent = '私のサイトへようこそ';
+                        welcomeMessage.style.position = 'absolute';
+                        welcomeMessage.style.top = '50%';
+                        welcomeMessage.style.left = '50%';
+                        welcomeMessage.style.transform = 'translate(-50%, -50%)';
+                        welcomeMessage.style.fontFamily = 'Orbitron, sans-serif';
+                        welcomeMessage.style.fontSize = '2.5rem';
+                        welcomeMessage.style.color = '#fff';
+                        welcomeMessage.style.textShadow = '0 0 10px rgba(255, 255, 255, 0.8)';
+                        welcomeMessage.style.opacity = '0';
+                        welcomeMessage.style.animation = 'fadeIn 2s ease-out forwards';
+
+                        document.body.appendChild(welcomeMessage);
+
+                        setTimeout(() => {
+                                welcomeMessage.style.opacity = '0';
+                                welcomeMessage.style.transition = 'opacity 2s ease-out';
+                                setTimeout(() => {
+                                        document.body.removeChild(welcomeMessage);
+                                }, 2000);
+                        }, 3000);
+                });
+        </script>
+        <style>
+                @keyframes fadeIn {
+                        0% { opacity: 0; }
+                        100% { opacity: 1; }
+                }
+                .menu {
+                        display: none;
+                        position: absolute;
+                        top: 50px;
+                        right: 10px;
+                        background-color: #333;
+                        padding: 10px;
+                        border-radius: 5px;
+                }
+
+                .menu a {
+                        display: block;
+                        color: #fff;
+                        text-decoration: none;
+                        margin: 5px 0;
+                }
+
+                .menu.active {
+                        display: block;
+                }
+        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My Portfolio</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500&family=Karat:wght@400;700&display=swap">
+        <style>
+                body {
+                        font-family: 'Orbitron', sans-serif;
+                        background: linear-gradient(135deg, #ffbdbd, #b8e4ff, #dcffe0, #fff9c6, #e1bdff, #ffbbbb);
+                        background-size: 400% 400%;
+                        animation: gradientAnimation 15s ease infinite;
+                        color: #fff;
+                        margin: 0;
+                        padding: 0;
+                        text-align: center;
+                        overflow-x: hidden;
+                        position: relative;
+                }
+        </style>
+</head>
+<body>
+        <nav>
+                <button class="menu-btn">Menu</button>
+                <div class="menu">
+                        <a href="#">Home</a>
+                        <a href="#">About</a>
+                        <a href="#">Portfolio</a>
+                        <a href="#">Contact</a>
+                </div>
+        </nav>
+        <img src="im.png" alt="Top Image" style="width: 100%; height: auto;">
+        <h1>My Portfolio</h1>
+        <div class="section">
+                <p class="highlight">Welcome to my portfolio website. Here you can find my latest projects and contact information.</p>
+        </div>
+        <div class="object"></div>
+        <div class="object"></div>
+        <div class="object"></div>
+</body>
+</html>
+<p><img src="ima.png" alt="" style="width: 80%; height: auto;"></p>
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+                const objects = document.querySelectorAll('.object');
+
+                const observer = new IntersectionObserver(entries => {
+                        entries.forEach(entry => {
+                                if (entry.isIntersecting) {
+                                        entry.target.classList.add('slide-in');
+                                }
+                        });
+                });
+
+                objects.forEach(object => {
+                        observer.observe(object);
+                });
+        });
+</script>
+<style>
+        .object {
+                width: 100px;
+                height: 100px;
+                background-color: #fff;
+                margin: 20px auto;
+                opacity: 0;
+                transform: translateX(-100%);
+                transition: transform 1s ease-out, opacity 1s ease-out;
+        }
+
+        .object.slide-in {
+                opacity: 1;
+                transform: translateX(0);
+        }
+</style>
+<style>
+        @keyframes slideInFromTopRight {
+                0% {
+                        opacity: 0;
+                        transform: translate(100%, -100%);
+                }
+                100% {
+                        opacity: 1;
+                        transform: translate(0, 0);
+                }
+        }
+
+        @keyframes slideOutToBottomLeft {
+                0% {
+                        opacity: 1;
+                        transform: translate(0, 0);
+                }
+                100% {
+                        opacity: 0;
+                        transform: translate(-100%, 100%);
+                }
+        }
+
+        .portfolio-animation {
+                font-family: 'Orbitron', sans-serif;
+                font-size: 3rem;
+                font-weight: bold;
+                color: #fff;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                opacity: 0;
+                animation: slideInFromTopRight 2s forwards, slideOutToBottomLeft 2s 4s forwards;
+        }
+</style>
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+                const portfolioText = document.createElement('div');
+                portfolioText.textContent = 'ポートフォリオ';
+                portfolioText.classList.add('portfolio-animation');
+                document.body.appendChild(portfolioText);
+        });
+</script>
+<style>
+        @keyframes slideInFromTopRight {
+                0% {
+                        opacity: 0;
+                        transform: translate(150%, -150%);
+                }
+                100% {
+                        opacity: 1;
+                        transform: translate(0, 0);
+                }
+        }
+
+        @keyframes slideOutToBottomLeft {
+                0% {
+                        opacity: 1;
+                        transform: translate(0, 0);
+                }
+                100% {
+                        opacity: 0;
+                        transform: translate(-150%, 150%);
+                }
+        }
+
+        .portfolio-animation {
+                font-family: 'Orbitron', sans-serif;
+                font-size: 4rem;
+                font-weight: bold;
+                color: #fff;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                opacity: 0;
+                text-align: center;
+                line-height: 1.2;
+                letter-spacing: 0.1em;
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
+                animation: slideInFromTopRight 2s forwards, slideOutToBottomLeft 2s 4s forwards;
+        }
+
+        .portfolio-animation span {
+                display: inline-block;
+                opacity: 0;
+                transform: translateY(-100%);
+                animation: letterFadeIn 0.5s forwards;
+        }
+
+        .portfolio-animation span:nth-child(1) { animation-delay: 0.1s; }
+        .portfolio-animation span:nth-child(2) { animation-delay: 0.2s; }
+        .portfolio-animation span:nth-child(3) { animation-delay: 0.3s; }
+        .portfolio-animation span:nth-child(4) { animation-delay: 0.4s; }
+        .portfolio-animation span:nth-child(5) { animation-delay: 0.5s; }
+        .portfolio-animation span:nth-child(6) { animation-delay: 0.6s; }
+        .portfolio-animation span:nth-child(7) { animation-delay: 0.7s; }
+        .portfolio-animation span:nth-child(8) { animation-delay: 0.8s; }
+        .portfolio-animation span:nth-child(9) { animation-delay: 0.9s; }
+        .portfolio-animation span:nth-child(10) { animation-delay: 1s; }
+
+        @keyframes letterFadeIn {
+                0% {
+                        opacity: 0;
+                        transform: translateY(-100%);
+                }
+                100% {
+                        opacity: 1;
+                        transform: translateY(0);
+                }
+        }
+
+        @keyframes shatter {
+                0% {
+                        opacity: 1;
+                        transform: translate(0, 0) rotate(0deg);
+                }
+                100% {
+                        opacity: 0;
+                        transform: translate(calc(var(--x) * 1px), calc(var(--y) * 1px)) rotate(calc(var(--r) * 1deg));
+                }
+        }
+
+        .shatter {
+                display: inline-block;
+                position: relative;
+                cursor: pointer;
+        }
+
+        .shatter span {
+                display: inline-block;
+                animation: shatter 1s forwards;
+                animation-delay: calc(var(--i) * 0.1s);
+                --x: calc(50 - (var(--i) % 5) * 10);
+                --y: calc(50 - (var(--i) / 5) * 10);
+                --r: calc(var(--i) * 10);
+        }
+        .shatter span:nth-child(1) { --i: 0; }
+        .shatter span:nth-child(2) { --i: 1; }                  
+        .shatter span:nth-child(3) { --i: 2; }
+        .shatter span:nth-child(4) { --i: 3; }
+        .shatter span:nth-child(5) { --i: 4; }
+        .shatter span:nth-child(6) { --i: 5; }
+        .shatter span:nth-child(7) { --i: 6; }
+        .shatter span:nth-child(8) { --i: 7; }
+        .shatter span:nth-child(9) { --i: 8; }
+        .shatter span:nth-child(10) { --i: 9; } 
+        .shatter span:nth-child(11) { --i: 10; }       
+</style>
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+                const portfolioText = document.createElement('div');
+                portfolioText.classList.add('portfolio-animation');
+                const text = 'ポートフォリオ';
+                for (let i = 0; i < text.length; i++) {
+                        const span = document.createElement('span');
+                        span.textContent = text[i];
+                        portfolioText.appendChild(span);
+                }
+                document.body.appendChild(portfolioText);
+        });
+                const shatterText = document.createElement('div');
+                shatterText.classList.add('shatter');
+                const shatterContent = 'ポートフォリオ';
+                for (let i = 0; i < shatterContent.length; i++) {
+                        const span = document.createElement('span');
+                        span.textContent = shatterContent[i];
+                        shatterText.appendChild(span);
+                }
+                document.body.appendChild(shatterText);
+       

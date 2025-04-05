@@ -1,0 +1,43 @@
+body {
+  background-color: lightsteelblue;
+}
+body {
+  text-align: center;
+}
+.radio-inline__input {
+  display: none;
+}
+
+.radio-inline__label {
+  display: inline-block;
+  margin: 10px;
+  padding: 5px 10px;
+  border-radius: 3px;
+  outline: 2px auto black;
+  transition: all 0.2s;
+}
+
+.radio-inline__input:checked + .radio-inline__label {
+  background-color:aliceblue;
+  color:black;
+}
+
+.quiz-button {
+  margin: 15px;
+  padding: 6px 16px;
+  background-color: aliceblue;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid #cccccc;
+}
+
+.quiz-button:hover {
+  background-color: #aef6ff;
+}
+
+.quiz-button:active {
+  border: 1px solid #334c66;
+  background-color: #69c;
+  color: #e0ebf5;
+  box-shadow: inset 0px 0px 2px #3a6da0;
+}
